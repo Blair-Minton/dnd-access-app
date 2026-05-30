@@ -61,7 +61,7 @@ export default function AccessibleDiceRoller() {
       const newCount = Math.min(prev + 1, 99);
       return newCount;
     });
-    await sleep(1000); // Small delay to ensure the previous speech is canceled
+    await sleep(500); // Small delay to ensure the previous speech is canceled
     speakResult(`${diceCount + 1} dice`);
   };
 
