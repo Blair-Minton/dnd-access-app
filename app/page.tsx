@@ -68,10 +68,10 @@ export default function AccessibleDiceRoller() {
     speakResult(`${action === "decrement" ? diceCount - 1 : diceCount + 1} dice`);
 
     // Setup an interval to repeatedly fire while held down
-    timerRef.current = setInterval(() => {
-      if (action === "increment") incrementCount();
-      if (action === "decrement") decrementCount();
-    }, 500); // Fires every 500ms
+    //timerRef.current = setInterval(() => {
+    //  if (action === "increment") incrementCount();
+    //  if (action === "decrement") decrementCount();
+    //}, 500); // Fires every 500ms
   };
 
   const stopAdjusting = () => {
