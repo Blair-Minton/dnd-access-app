@@ -71,7 +71,7 @@ export default function AccessibleDiceRoller() {
     timerRef.current = setInterval(() => {
       if (action === "increment") incrementCount();
       if (action === "decrement") decrementCount();
-    }, 150); // Fires every 150ms
+    }, 500); // Fires every 500ms
   };
 
   const stopAdjusting = () => {
