@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 
 const DICE_TYPES = [4, 6, 8, 10, 12, 20, 100];
 
@@ -11,15 +11,12 @@ export default function AccessibleDiceRoller() {
   const [total, setTotal] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState<string>("");
 
-  // Ref to hold the interval ID for press-and-hold functionality
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
   // Handles the Text-to-Speech
   const speakResult = (text: string) => {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel(); // Stop any current speech
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.6; // Slightly slower for better comprehension
+      utterance.rate = 1.6; 
       utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
     }
@@ -56,29 +53,20 @@ export default function AccessibleDiceRoller() {
     speakResult(`D ${type}`);
   };
 
-  const incrementCount = () => setDiceCount((prev) => Math.min(prev + 1, 99));
-  const decrementCount = () => setDiceCount((prev) => Math.max(prev - 1, 1));
-
-  // Press and hold logic
-  const startAdjusting = (action: "increment" | "decrement") => {
-    // Fire once immediately on initial press
-    if (action === "increment") incrementCount();
-    speakResult(`${action === "increment" ? diceCount + 1 : diceCount - 1} dice`);
-    if (action === "decrement") decrementCount();
-    speakResult(`${action === "decrement" ? diceCount - 1 : diceCount + 1} dice`);
-
-    // Setup an interval to repeatedly fire while held down
-    //timerRef.current = setInterval(() => {
-    //  if (action === "increment") incrementCount();
-    //  if (action === "decrement") decrementCount();
-    //}, 500); // Fires every 500ms
+  const handleIncrement = () => {
+    setDiceCount((prev) => {
+      const nextCount = Math.min(prev + 1, 99);
+      speakResult(`${nextCount} dice`);
+      return nextCount;
+    });
   };
 
-  const stopAdjusting = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+  const handleDecrement = () => {
+    setDiceCount((prev) => {
+      const nextCount = Math.max(prev - 1, 1);
+      speakResult(`${nextCount} dice`);
+      return nextCount;
+    });
   };
 
   return (
@@ -103,11 +91,7 @@ export default function AccessibleDiceRoller() {
           </h2>
           <div className="flex items-center gap-8">
             <button
-              onMouseDown={() => startAdjusting("decrement")}
-              onMouseUp={stopAdjusting}
-              onMouseLeave={stopAdjusting}
-              onTouchStart={(e) => { e.preventDefault(); startAdjusting("decrement"); }}
-              onTouchEnd={stopAdjusting}
+              onClick={handleDecrement}
               aria-label="Decrease number of dice"
               className="bg-red-600 hover:bg-red-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors select-none"
             >
@@ -120,11 +104,7 @@ export default function AccessibleDiceRoller() {
               {diceCount}
             </span>
             <button
-              onMouseDown={() => startAdjusting("increment")}
-              onMouseUp={stopAdjusting}
-              onMouseLeave={stopAdjusting}
-              onTouchStart={(e) => { e.preventDefault(); startAdjusting("increment"); }}
-              onTouchEnd={stopAdjusting}
+              onClick={handleIncrement}
               aria-label="Increase number of dice"
               className="bg-blue-600 hover:bg-blue-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors select-none"
             >
@@ -170,42 +150,40 @@ export default function AccessibleDiceRoller() {
           ROLL
         </button>
 
-      {/* Results Area */}
-      {total !== null && (
-        <section
-          aria-label="Roll Results"
-          className="flex flex-col items-center bg-white text-black p-6 md:p-12 rounded-3xl border-8 border-gray-300 mt-8 w-full max-w-4xl overflow-hidden"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 uppercase tracking-widest text-gray-600">
-            Total
-          </h2>
-          
-          {/* Clean text scaling using responsive text sizes and word breaks */}
-          <div className="text-7xl sm:text-9xl md:text-[12rem] leading-none font-black text-center break-all dynamic-font-size px-2 max-w-full">
-            {total}
-          </div>
-
-          {/* Only show individual rolls if there is more than 1 die */}
-          {diceCount > 1 && (
-            <div className="mt-8 text-center border-t-4 border-gray-300 pt-8 w-full">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-600">
-                Individual Rolls
-              </h3>
-              {/* Changed to flex-wrap with an explicit max-w to keep it inside the box boundaries */}
-              <div className="text-3xl md:text-5xl font-bold flex flex-wrap justify-center gap-4 max-h-64 overflow-y-auto p-2">
-                {rolls.map((roll, index) => (
-                  <span
-                    key={index}
-                    className="bg-gray-200 px-4 py-2 rounded-xl inline-block"
-                  >
-                    {roll}
-                  </span>
-                ))}
-              </div>
+        {/* Results Area */}
+        {total !== null && (
+          <section
+            aria-label="Roll Results"
+            className="flex flex-col items-center bg-white text-black p-6 md:p-12 rounded-3xl border-8 border-gray-300 mt-8 w-full max-w-4xl overflow-hidden"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 uppercase tracking-widest text-gray-600">
+              Total
+            </h2>
+            
+            <div className="text-7xl sm:text-9xl md:text-[12rem] leading-none font-black text-center break-all dynamic-font-size px-2 max-w-full">
+              {total}
             </div>
-          )}
-        </section>
-      )}
+
+            {/* Only show individual rolls if there is more than 1 die */}
+            {diceCount > 1 && (
+              <div className="mt-8 text-center border-t-4 border-gray-300 pt-8 w-full">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-600">
+                  Individual Rolls
+                </h3>
+                <div className="text-3xl md:text-5xl font-bold flex flex-wrap justify-center gap-4 max-h-64 overflow-y-auto p-2">
+                  {rolls.map((roll, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-200 px-4 py-2 rounded-xl inline-block"
+                    >
+                      {roll}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </main>
   );
