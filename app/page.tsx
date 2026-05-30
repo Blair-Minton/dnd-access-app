@@ -11,6 +11,8 @@ export default function AccessibleDiceRoller() {
   const [total, setTotal] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState<string>("");
 
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   // Handles the Text-to-Speech
   const speakResult = (text: string) => {
     if ("speechSynthesis" in window) {
@@ -54,12 +56,13 @@ export default function AccessibleDiceRoller() {
   };
 
   // Speaks when the amount of dice is incremented
-  const handleIncrement = () => {
+  const handleIncrement = async () => {
     setDiceCount((prev) => {
       const newCount = Math.min(prev + 1, 99);
-      speakResult(`${newCount} dice`);
       return newCount;
     });
+    await sleep(350); // Small delay to ensure the previous speech is canceled
+    speakResult(`${diceCount + 1} dice`);
   };
 
   // Speaks when the amount of dice is decremented
