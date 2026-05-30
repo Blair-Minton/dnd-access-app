@@ -16,7 +16,7 @@ export default function AccessibleDiceRoller() {
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel(); // Stop any current speech
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.6; 
+      utterance.rate = 0.85; // Slightly slower for better comprehension
       utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
     }
@@ -53,19 +53,21 @@ export default function AccessibleDiceRoller() {
     speakResult(`D ${type}`);
   };
 
+  // Speaks when the amount of dice is incremented
   const handleIncrement = () => {
     setDiceCount((prev) => {
-      const nextCount = Math.min(prev + 1, 99);
-      speakResult(`${nextCount} dice`);
-      return nextCount;
+      const newCount = Math.min(prev + 1, 99);
+      speakResult(`${newCount} dice`);
+      return newCount;
     });
   };
 
+  // Speaks when the amount of dice is decremented
   const handleDecrement = () => {
     setDiceCount((prev) => {
-      const nextCount = Math.max(prev - 1, 1);
-      speakResult(`${nextCount} dice`);
-      return nextCount;
+      const newCount = Math.max(prev - 1, 1);
+      speakResult(`${newCount} dice`);
+      return newCount;
     });
   };
 
@@ -93,7 +95,7 @@ export default function AccessibleDiceRoller() {
             <button
               onClick={handleDecrement}
               aria-label="Decrease number of dice"
-              className="bg-red-600 hover:bg-red-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors select-none"
+              className="bg-red-600 hover:bg-red-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors"
             >
               -
             </button>
@@ -106,7 +108,7 @@ export default function AccessibleDiceRoller() {
             <button
               onClick={handleIncrement}
               aria-label="Increase number of dice"
-              className="bg-blue-600 hover:bg-blue-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors select-none"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-6xl font-bold w-24 h-24 rounded-2xl focus:outline-none focus:ring-8 focus:ring-yellow-400 transition-colors"
             >
               +
             </button>
@@ -154,32 +156,31 @@ export default function AccessibleDiceRoller() {
         {total !== null && (
           <section
             aria-label="Roll Results"
-            className="flex flex-col items-center bg-white text-black p-6 md:p-12 rounded-3xl border-8 border-gray-300 mt-8 w-full max-w-4xl overflow-hidden"
+            className="flex flex-col items-center bg-white text-black p-12 rounded-3xl border-8 border-gray-300 mt-8"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 uppercase tracking-widest text-gray-600">
+            <h2 className="text-5xl font-bold mb-4 uppercase tracking-widest text-gray-600">
               Total
             </h2>
-            
-            <div className="text-7xl sm:text-9xl md:text-[12rem] leading-none font-black text-center break-all dynamic-font-size px-2 max-w-full">
+            <div className="text-[12rem] leading-none font-black text-center">
               {total}
             </div>
 
             {/* Only show individual rolls if there is more than 1 die */}
             {diceCount > 1 && (
               <div className="mt-8 text-center border-t-4 border-gray-300 pt-8 w-full">
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-gray-600">
+                <h3 className="text-3xl font-bold mb-4 text-gray-600">
                   Individual Rolls
                 </h3>
-                <div className="text-3xl md:text-5xl font-bold flex flex-wrap justify-center gap-4 max-h-64 overflow-y-auto p-2">
+                <p className="text-5xl font-bold flex flex-wrap justify-center gap-4">
                   {rolls.map((roll, index) => (
                     <span
                       key={index}
-                      className="bg-gray-200 px-4 py-2 rounded-xl inline-block"
+                      className="bg-gray-200 px-4 py-2 rounded-xl"
                     >
                       {roll}
                     </span>
                   ))}
-                </div>
+                </p>
               </div>
             )}
           </section>
